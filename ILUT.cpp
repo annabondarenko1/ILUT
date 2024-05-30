@@ -5,21 +5,20 @@
 #include <cstdlib>
 #include <ctime>
 
-// Структура для представления матрицы в формате CSR
+
 struct CSRMatrix {
     std::vector<int> row_ptr;
     std::vector<int> col_idx;
     std::vector<double> values;
-    int n; // Размер матрицы (предполагаем, что она квадратная)
+    int n; 
 
     CSRMatrix(int size) : n(size) {
         row_ptr.resize(n + 1, 0);
     }
 
-    // Функция для добавления значения в CSR матрицу
     void addValue(int row, int col, double value) {
         if (row < 0 || row >= n || col < 0 || col >= n) {
-            std::cerr << "Invalid index for adding value: (" << row << "," << col << ")" << std::endl;
+            std::cerr << "WRONG INDEX for: (" << row << "," << col << ")" << std::endl;
             return;
         }
         row_ptr[row + 1]++;
@@ -27,7 +26,6 @@ struct CSRMatrix {
         values.push_back(value);
     }
 
-    // Завершение формирования CSR матрицы
     void finalize() {
         for (int i = 1; i <= n; ++i) {
             row_ptr[i] += row_ptr[i - 1];
@@ -35,7 +33,7 @@ struct CSRMatrix {
     }
 };
 
-// Функция для генерации случайной матрицы в формате CSR
+
 void generateRandomCSRMatrix(CSRMatrix &A, int density, double maxValue) {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     for (int i = 0; i < A.n; ++i) {
@@ -49,7 +47,6 @@ void generateRandomCSRMatrix(CSRMatrix &A, int density, double maxValue) {
     A.finalize();
 }
 
-// Функция для поиска индекса в CSR массиве
 int findIndex(const CSRMatrix &matrix, int row, int col) {
     for (int j = matrix.row_ptr[row]; j < matrix.row_ptr[row + 1]; ++j) {
         if (matrix.col_idx[j] == col) {
@@ -59,7 +56,6 @@ int findIndex(const CSRMatrix &matrix, int row, int col) {
     return -1;
 }
 
-// ILU(tau) разложение
 void ILU_tau(CSRMatrix &A, CSRMatrix &L, CSRMatrix &U, double tau) {
     std::vector<double> diag(A.n, 0.0);
 
@@ -116,7 +112,6 @@ void ILU_tau(CSRMatrix &A, CSRMatrix &L, CSRMatrix &U, double tau) {
     U.finalize();
 }
 
-// Функция для преобразования CSR матрицы в плотную матрицу
 std::vector<std::vector<double>> convertCSRToDense(const CSRMatrix &A) {
     std::vector<std::vector<double>> dense(A.n, std::vector<double>(A.n, 0.0));
     for (int i = 0; i < A.n; ++i) {
@@ -127,7 +122,6 @@ std::vector<std::vector<double>> convertCSRToDense(const CSRMatrix &A) {
     return dense;
 }
 
-// Функция для вывода плотной матрицы
 void printDenseMatrix(const std::vector<std::vector<double>> &matrix) {
     for (const auto &row : matrix) {
         for (double val : row) {
