@@ -4,6 +4,7 @@
 #include <ctime>
 #include <cmath>
 #include <iomanip>
+#include <omp.h>
 
 using namespace std;
 
@@ -46,7 +47,8 @@ CSRMatrix LUdecomposition(const CSRMatrix &A, int n, double tau) {
     
     vector<double> rowU(n, 0.0);
     vector<double> rowL(n, 0.0);
-    
+
+    #pragma omp parallel for private(rowU, rowL) shared(L, U)
     for (int i = 0; i < n; ++i) {
         fill(rowU.begin(), rowU.end(), 0.0);
         fill(rowL.begin(), rowL.end(), 0.0);
@@ -76,23 +78,26 @@ CSRMatrix LUdecomposition(const CSRMatrix &A, int n, double tau) {
             }
         }
         
-        for (int j = 0; j < i; ++j) {
-            if (rowL[j] != 0.0) {
-                L.values.push_back(rowL[j]);
-                L.col_indices.push_back(j);
+        #pragma omp critical
+        {
+            for (int j = 0; j < i; ++j) {
+                if (rowL[j] != 0.0) {
+                    L.values.push_back(rowL[j]);
+                    L.col_indices.push_back(j);
+                }
             }
-        }
-        L.values.push_back(1.0);
-        L.col_indices.push_back(i);
-        L.row_ptr.push_back(L.values.size());
-        
-        for (int j = i; j < n; ++j) {
-            if (rowU[j] != 0.0) {
-                U.values.push_back(rowU[j]);
-                U.col_indices.push_back(j);
+            L.values.push_back(1.0);
+            L.col_indices.push_back(i);
+            L.row_ptr.push_back(L.values.size());
+            
+            for (int j = i; j < n; ++j) {
+                if (rowU[j] != 0.0) {
+                    U.values.push_back(rowU[j]);
+                    U.col_indices.push_back(j);
+                }
             }
+            U.row_ptr.push_back(U.values.size());
         }
-        U.row_ptr.push_back(U.values.size());
     }
     
     return L;
@@ -116,21 +121,17 @@ void printCSRMatrix(const CSRMatrix &A, int n) {
 
 int main() {
     int n = 5;  // размер матрицы
-    std::cout << "SIZE: ";
-    std::cin >> n;
     int sparsity = 50; // вероятность ненулевого элемента (в процентах)
     double tau = 0.1; // относительный допуск
-    std::cout << "TAU: ";
-    std::cin >> tau;
 
     CSRMatrix A = generateRandomMatrix(n, sparsity);
-    // cout << "Matrix A (in CSR format):" << endl;
-    // printCSRMatrix(A, n);
+    cout << "Matrix A (in CSR format):" << endl;
+    printCSRMatrix(A, n);
 
     CSRMatrix L = LUdecomposition(A, n, tau);
 
-    // cout << "\nMatrix L (in CSR format):" << endl;
-    // printCSRMatrix(L, n);
+    cout << "\nMatrix L (in CSR format):" << endl;
+    printCSRMatrix(L, n);
 
     return 0;
 }
