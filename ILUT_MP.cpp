@@ -16,8 +16,7 @@ struct CSRMatrix {
     vector<int> rowIndex;
 };
 
-// Функция для создания CSR-матрицы
-CSRMatrix generateRandomCSRMatrix(int size, double density = 0.5, double minVal = -10, double maxVal = 10) {
+CSRMatrix generateRandomCSRMatrix(int size, double density = 0.001, double minVal = -10, double maxVal = 10) {
     CSRMatrix csr;
     csr.rowIndex.push_back(0);
     srand(time(0));
@@ -36,7 +35,6 @@ CSRMatrix generateRandomCSRMatrix(int size, double density = 0.5, double minVal 
     return csr;
 }
 
-// Функция для получения строки из CSR-матрицы
 vector<double> getRow(const CSRMatrix& matrix, int row) {
     vector<double> result(matrix.rowIndex.size() - 1, 0.0);
     for (int idx = matrix.rowIndex[row]; idx < matrix.rowIndex[row + 1]; ++idx) {
@@ -45,7 +43,6 @@ vector<double> getRow(const CSRMatrix& matrix, int row) {
     return result;
 }
 
-// Функция для вычисления нормы строки
 double rowNorm(const vector<double>& row) {
     double norm = 0.0;
     for (double value : row) {
@@ -54,7 +51,6 @@ double rowNorm(const vector<double>& row) {
     return norm;
 }
 
-// Функция для LU-разложения с учетом относительной погрешности в формате CSR
 void LUDecompositionCSR(const CSRMatrix& A, CSRMatrix& L, CSRMatrix& U, double tau) {
     int n = A.rowIndex.size() - 1;
     vector<unordered_map<int, double>> lRows(n), uRows(n);
@@ -100,7 +96,6 @@ void LUDecompositionCSR(const CSRMatrix& A, CSRMatrix& L, CSRMatrix& U, double t
         }
     }
 
-    // Преобразование lRows и uRows в CSR формат
     L.rowIndex.push_back(0);
     U.rowIndex.push_back(0);
 
@@ -119,7 +114,6 @@ void LUDecompositionCSR(const CSRMatrix& A, CSRMatrix& L, CSRMatrix& U, double t
     }
 }
 
-// Функция для преобразования CSR-матрицы в обычный формат
 vector<vector<double>> convertCSRToDense(const CSRMatrix& matrix) {
     int n = matrix.rowIndex.size() - 1;
     vector<vector<double>> denseMatrix(n, vector<double>(n, 0.0));
@@ -133,7 +127,6 @@ vector<vector<double>> convertCSRToDense(const CSRMatrix& matrix) {
     return denseMatrix;
 }
 
-// Функция для вывода обычной матрицы
 void printDenseMatrix(const vector<vector<double>>& matrix) {
     for (const auto& row : matrix) {
         for (double value : row) {
