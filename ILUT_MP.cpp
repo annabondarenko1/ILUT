@@ -121,17 +121,19 @@ void printCSRMatrix(const CSRMatrix &A, int n) {
 
 int main() {
     int n = 5;  // размер матрицы
+    std::cout << "SIZE: ";
+    std::cin >> n;
     int sparsity = 50; // вероятность ненулевого элемента (в процентах)
     double tau = 0.1; // относительный допуск
+    std::cout << "TAU: ";
+    std::cin >> tau;
 
     CSRMatrix A = generateRandomMatrix(n, sparsity);
-    cout << "Matrix A (in CSR format):" << endl;
-    printCSRMatrix(A, n);
+    // cout << "Matrix A (in CSR format):" << endl;
+    // printCSRMatrix(A, n);
 
     CSRMatrix L = LUdecomposition(A, n, tau);
 
-    cout << "\nMatrix L (in CSR format):" << endl;
-    printCSRMatrix(L, n);
-
-    return 0;
+    // cout << "\nMatrix L (in CSR format):" << endl;
+    // printCSRMatrix(L, n);
 }
